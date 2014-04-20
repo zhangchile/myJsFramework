@@ -1,5 +1,6 @@
 /**
  * javascript 实用类库
+ *
  * @author chilezhang
  * @link github.com/zhangchile
  * @version 1.0
@@ -8,6 +9,7 @@ var _ = function() {};
 
 /**
 * DOM ready
+*
 * @param function
 *
 */
@@ -55,6 +57,7 @@ _.prototype.Events = {
     },
     //this standardize method produces a unified set of event 
     //properties, regardless of the browser
+    //
     standardize: function(event) {
         var page = this.getMousePositionRelativeToDocument(event);
         var offset = this.getMousePositionOffset(event);
@@ -96,5 +99,44 @@ _.prototype.Events = {
             character = String.fromCharCode(event.which);
         }
         return character;
+    },
+    getMousePositionRelativeToDocument: function(event) {
+        var x = 0, y = 0;
+        if(event.pageX) {
+            x = event.pageX;
+            y = event.pageY;
+        } else if (event.clientX) {
+            x = event.clientX + document.body.scrollLeft + 
+                document.documentElement.scrollLeft;
+            y = event.clentY + document.body.scrollTop + 
+                document.documentElement.scrollTop;
+        }
+        return {
+            x: x,
+            y: y
+        }
+    },
+    getMousePositionOffset: function(event) {
+        var x = 0, y = 0;
+        if(event.layerX) {
+            x = event.layerX;
+            y = event.layerY;
+        } else if (event.offsetX) {
+            x = event.offsetX;
+            y = event.offsetY;
+        }
+        return {
+            x: x,
+            y: y
+        }        
+    },
+    getRelatedTarget: function(event) {
+        var relatedTarget = event.relatedTarget;
+        if(event.type == "mouseover") {
+            relatedTarget = event.fromElement;
+        } else if (event.type == "mouseout") {
+            relatedTarget = event.toElement;
+        }
+        return relatedTarget;
     }
-}
+};
