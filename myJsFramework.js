@@ -2,9 +2,10 @@
  * javascript 实用类库
  *
  * @author chilezhang
- * @link github.com/zhangchile
+ * @link https://www.github.com/zhangchile/
  * @version 1.0
 */
+
 var _ = function() {};
 
 /**
@@ -13,6 +14,7 @@ var _ = function() {};
 * @param function
 *
 */
+
 _.prototype.onDomReady = function(callback) {
     if(document.addEventListener) {
         document.addEventListener("DOMContentLoaded", callback, false);
@@ -24,6 +26,7 @@ _.prototype.onDomReady = function(callback) {
         }
     }
 }
+
 /**
 * standard handle events
 *
@@ -138,5 +141,115 @@ _.prototype.Events = {
             relatedTarget = event.toElement;
         }
         return relatedTarget;
+    }
+};
+
+/**
+*  ajax load method name Remote
+*  
+*  include _.Remote.load() (use GET) and _.Remote.save (use POST)
+*
+*/
+
+_.prototype.Remote = {
+    //getConnector method return a connection object
+    getConnector: function() {
+        var connectionObj = null;
+        if(window.XMLHttpRequest) {//w3c supported
+            connectionObj = new XMLHttpRequest();
+        } else if(window.ActiveXObject) {//IE
+            connectionObj = new ActiveXObject("Microsoft.XMLHttp");
+        }
+        return connectionObj;
+    },
+
+    //setting the the callback function while it get a response  
+    configureConnector: function(connector, callback, tid) {
+        connector.onreadystatechange = function() {
+            if(connector.readyState == 4) {
+                if(connector.status == 200) {
+                    if(tid) {
+                        clearTimeout(tid); 
+                    }
+                    callback.call(connector, {
+                        text: connector.responseText,
+                        xml: connector.responseXML
+                    });
+                }
+            }
+        }
+    },
+
+    //abort a connection while timeout and retry it
+    abortLoad: function(connector, request, autoReload, callback) {
+        connector.abort();
+        if(autoReload) {
+            this.load(request);
+        } else {
+            callback();
+        }
+    },
+
+    /**
+    * the function need a object literal containing a URL to load,
+    * use method get ,such an example:
+    * _.Remote.load({
+    *                 url: 'www.google.com',
+    *                 timeout:'60',
+    *                 autoReload: true,
+    *                 callback: function(response){alert(response.text);}
+    *                 timeoutCallback: function(){alert('timeout')}
+    * //if autoReload is true, this timeoutCallback function will not usefull
+    *              });
+    */
+    load: function(request) {
+        var url = request.url || "";
+        var callback = request.callback || function(){};
+        var timeoutCallback = request.timeoutCallback || function(){};        
+        var timeout = request.timeout || -1;
+        var autoReload = request.autoReload || false;
+
+        var connector = this.getConnector();
+        if(connector) {
+            var tid;
+            if(timeout > 0) {
+                var that = this;
+                tid = setTimeout(function(){
+                    that.abortLoad.call(that, connector, request, 
+                        autoReload, timeoutCallback);
+                }, timeout);
+            }
+            this.configureConnector(connector, callback, tid);
+            connector.open("GET", url, true);
+            connector.send("");
+        }
+    },
+
+    /**
+    * the function need a object literal containing a URL to load,
+    * use method post ,such an example:
+    * _.Remote.save({
+    *                 url: 'www.google.com',
+    *                 data: 'data1=1&dat2=2'
+    *                 callback: function(response){alert(response.text);}
+    *              });
+    */
+    save: function(request) {
+        var url = request.url || "";
+        var callback = request.callback || function(){};
+        //param=value1&&param2=value2....
+        var data = request.data || "";
+
+        var connector = this.getConnector();
+        if(connector) {
+            this.configureConnector(connector, callback);
+            connector.open("POST", url, true);
+            connector.setRequestHeader("Content-type",
+                "application/x-www-form-urlencoded");
+            //XMLHttpRequest isn't allowed to set these headers, 
+            //they are being set automatically by the browser.
+            //connector.setRequestHeader("Connection", "close");
+            connector.send(data);
+        }
     }
 };
