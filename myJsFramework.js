@@ -49,6 +49,7 @@ _.prototype.Events = {
             });
         }
     },
+    
     //this  remove method allow us to remove a function from a element.
     remove: function(element, eventType, callback) {
         eventType = eventType.toLowerCase();
@@ -58,6 +59,7 @@ _.prototype.Events = {
             element.detachEvent("on" + eventType, callback);
         }
     },
+
     //this standardize method produces a unified set of event 
     //properties, regardless of the browser
     //
@@ -86,6 +88,7 @@ _.prototype.Events = {
             }
         };
     },
+
     // return the element the event occurred on
     getTarget: function(event) {
         var target = event.srcElement || event.target;
@@ -94,6 +97,7 @@ _.prototype.Events = {
         }
         return target;
     },
+
     getCharacterFromKey: function(event) {
         var character = "";
         if(event.keyCode) {//IE
@@ -103,6 +107,7 @@ _.prototype.Events = {
         }
         return character;
     },
+
     getMousePositionRelativeToDocument: function(event) {
         var x = 0, y = 0;
         if(event.pageX) {
@@ -119,6 +124,7 @@ _.prototype.Events = {
             y: y
         }
     },
+
     getMousePositionOffset: function(event) {
         var x = 0, y = 0;
         if(event.layerX) {
@@ -133,6 +139,7 @@ _.prototype.Events = {
             y: y
         }        
     },
+
     getRelatedTarget: function(event) {
         var relatedTarget = event.relatedTarget;
         if(event.type == "mouseover") {
@@ -251,5 +258,64 @@ _.prototype.Remote = {
             //connector.setRequestHeader("Connection", "close");
             connector.send(data);
         }
+    }
+};
+
+/**
+*  utils 包含了许多实用的方法
+*  
+*  
+*
+*/
+
+_.prototype.Utils = {
+    //mergeObjects 将两个对象合并为一个对象
+    //注意：前一个对象的属性将会被后一个覆盖
+    mergeObjects: function(original, newObject) {
+        //获取所有属性
+        for(var key in newObject) {
+            if(newObject.hasOwnProperty(key)) {
+                var newPropertyValue = newObject[key];
+                var originalPropertyValue = original[key];
+            }
+            //合并属性值
+            original[key] = (originalPropertyValue && 
+                            typeof newPropertyValue == "object" && 
+                            typeof originalPropertyValue == "object") ?
+            this.mergeObjects(originalPropertyValue, newPropertyValue) :
+            newPropertyValue;
+        }
+        return original;
+    },
+
+    //_.Utils.replaceText("i am {name}",{name:"Mike"});
+    //"i am {name}" => "i am Mike"
+    replaceText: function(text, values){
+        for(var key in values) {
+            if(values.hasOwnProperty(key)) {
+                if(typeof values[key] == undefined) {
+                    values[key] = "";
+                }
+                text = text.replace(new RegExp("{" + key + "}", "g"),
+                                    values[key]);
+            }
+        }
+        return text;
+    },
+
+    //background-color => backgroundColor
+    toCamelCase: function(hyphenatedValue) {
+        var result = hyphenatedValue.replace(/- \D/g, function(character){
+            return character.charAt(1).toUpperCase();
+        });
+        return result;
+    },
+
+    //backgroundColor => background-color
+    toHyphens: function(camelCaseValue) {
+        var result = camelCaseValue.replace(/[A-Z]/g, function(character){
+            return ("-" + character.charAt(0).toLowerCase());
+        });
+        return result;
     }
 };
