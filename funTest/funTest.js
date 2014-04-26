@@ -47,3 +47,44 @@ _.Remote.save({
 });
 
 /*-----------------------------------------------------------*/
+
+/**
+*  _.Utils 的测试用例
+*
+*
+*
+*/
+
+var Animal = {
+    high: 1,
+    weight: 2,
+    legs: 2
+};
+var cat = {
+    legs: 4,
+    tail: true
+}
+cat = _.Utils.mergeObjects(Animal, cat);
+//output
+// {
+//     cat.high = 1
+//     cat.weight = 2
+//     cat.legs = 4
+//     cat.tail = true 
+// }
+for(var key in cat) {
+    if(cat.hasOwnProperty(key)) {
+        console.log("cat." + key + "=" + cat[key]);
+    }
+}
+
+//output "Hi,i am Mike."
+console.log(_.Utils.replaceText("Hi,i am {name}.", {name: "Mike"}));
+
+//output "marginLeft"
+console.log(_.Utils.toCamelCase("margin-left"));
+
+//output "font-Family"
+console.log(_.Utils.toHyphens("fontFamily"));
+
+/*-----------------------------------------------------------*/

@@ -305,7 +305,7 @@ _.prototype.Utils = {
 
     //background-color => backgroundColor
     toCamelCase: function(hyphenatedValue) {
-        var result = hyphenatedValue.replace(/- \D/g, function(character){
+        var result = hyphenatedValue.replace(/-\D/g, function(character){
             return character.charAt(1).toUpperCase();
         });
         return result;
