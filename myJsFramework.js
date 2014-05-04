@@ -319,3 +319,77 @@ _.prototype.Utils = {
         return result;
     }
 };
+
+/**
+*  CSS 包含了许多处理CSS属性的方法
+*  
+*  
+*
+*/
+
+_.prototype.CSS = {
+    //get the element current styles
+    getAppliedStyle: function(element, styleName) {
+        var style = "";
+        if(window.getComputedStyle) {
+            style = element.ownerDocument.defaultView.getComputedStyle(
+                element, null).getPropertyValue(_.Utils.toHyphens(styleName));
+        } else if(element.currentStyle) {//IE
+            style = element.currentStyle[_.Utils.toCamelCase(styleName)];
+        }
+        return style;
+    },
+
+    getArrayOfClassNames: function(element) {
+        var classNames = [];
+        if(element.className) {
+            classNames = element.className.split(" ");
+        }
+        return classNames;
+    },
+
+    addClass: function(element, className) {
+        var classNames = this.getArrayOfClassNames(element);
+        classNames.push(className);
+        element.className = classNames.join(" ");
+    },
+
+    removeClass: function(element, className) {
+        var classNames = this.getArrayOfClassNames(element);
+        var resultingClassNames = [];
+        for(var index = 0; index < classNames.length; index++) {
+            if(className != classNames[index]) {
+                resultingClassNames.push(classNames[index]);
+            }
+        }
+        element.className = resultingClassNames.join(" ");
+    },
+
+    hasClass: function(element, className) {
+        var isClassNamePresent = false;
+        var classNames = this.getArrayOfClassNames(element);
+        for(var index = 0; index < classNames.length; index++) {
+            if(className == classNames[index]) {
+                isClassNamePresent = true;
+            }
+        }
+        return isClassNamePresent;
+    },
+
+    getPosition: function(element) {
+        var x = 0, y = 0;
+        var elementBackUp = element;
+        if(element.OffsetParent) {
+            do {
+                x += element.offsetLeft;
+                y += element.offsetTop;
+            }while(element = element.offsetParent);
+        }
+        return {
+            x: x,
+            y: y,
+            height: elementBackUp.offsetHeight,
+            width:elementBackUp.offsetWidth
+        }
+    }
+};
