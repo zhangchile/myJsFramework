@@ -379,7 +379,7 @@ _.prototype.CSS = {
     getPosition: function(element) {
         var x = 0, y = 0;
         var elementBackUp = element;
-        if(element.OffsetParent) {
+        if(element.offsetParent) {
             do {
                 x += element.offsetLeft;
                 y += element.offsetTop;
